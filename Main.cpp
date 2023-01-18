@@ -6,17 +6,20 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void process_input(GLFWwindow* window);
 
 const char* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;"
+"layout (location = 0) in vec3 aPos;\n"
+"out vec4 vertexColor;"
 "void main()\n"
 "{\n"
-"gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+"gl_Position = vec4(aPos, 1.0);\n"
+"vertexColor = vec4(0.0, 0.5, 0.0, 1.0);\n"
 "}\0";
 
 const char* fragmentShaderSource = "#version 330 core\n"
+"uniform vec4 gColor;\n"
 "out vec4 FragColor;\n"
 "void main()\n"
 "{\n"
-"FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);"
+"FragColor = gColor;"
 "}\0";
 int main()
 {
@@ -140,7 +143,14 @@ int main()
 		glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		//Determine square color based upon time
+		float timeValue = glfwGetTime();
+		float colorValue = (sin(timeValue) / 2.0f) + 0.5f;
+		int vertexColorLocation = glGetUniformLocation(shaderProgram, "gColor");
+
 		glUseProgram(shaderProgram);
+		glUniform4f(vertexColorLocation, colorValue, 0.0f, 0.0f, 1.0f);
+
 		glBindVertexArray(VAO);
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
